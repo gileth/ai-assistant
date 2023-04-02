@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div class="container">
+    <div class="leftSide">
+        <div class="header">
+
+            <ul class="nav_icons">
+<!--                <li><ion-icon name="scan-circle-outline"></ion-icon></li>-->
+<!--                <li><ion-icon name="chatbox"></ion-icon></li>-->
+<!--                <li><ion-icon name="ellipsis-vertical"></ion-icon></li>-->
+            </ul>
+        </div>
+        <div class="chatlist">
+            <div class="block unread">
+                <div class="details">
+                    <div class="message_p">
+                        <p>此处增加一些配置选项</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="rightSide">
+        <div class="header">
+            <div class="imgText">
+
+                <h4><br><span></span></h4>
+            </div>
+            <ul class="nav_icons">
+<!--                <li><ion-icon name="search-outline"></ion-icon></li>-->
+<!--                <li><ion-icon name="ellipsis-vertical"></ion-icon></li>-->
+            </ul>
+        </div>
+
+        <div class="chatBox" name="chatBox">
+            <div class="message my_message">
+                <p>最近，我看了一些幽默笑话。<br><span>12:15</span></p>
+            </div>
+            <div class="message frnd_message">
+                <p>嗯，然后呢？<br><span>12:16</span></p>
+            </div>
+            <div class="message my_message">
+                <p>你想听吗？我可以给你讲一讲<br><span>12:17</span></p>
+            </div>
+            <div class="message frnd_message">
+                <p>好笑吗？<br><span>12:18</span></p>
+            </div>
+            <div class="message my_message">
+                <p>很好笑的，一个女孩在婚前如何区分内向和外向的软件开发人员？性格外向的开发人员在与您交谈时会看着您的鞋子。那么，内向的人是怎么做的呢？他们不能和女人说话。😄<br><span>12:19</span></p>
+            </div>
+            <div class="message frnd_message">
+                <p>哈哈哈哈哈哈<br><span>12:20</span></p>
+            </div>
+
+        </div>
+        <div class="chatBox_input">
+<!--            <ion-icon name="happy-outline"></ion-icon>-->
+<!--            <ion-icon name="attach-outline"></ion-icon>-->
+            <input type="text" placeholder="输入聊天内容">
+            <ion-icon name="chatbox-ellipses" id="sendMsg"></ion-icon>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+<script src="https://cdn.staticfile.org/jquery/3.6.4/jquery.min.js"  crossorigin="anonymous"></script>
+
+<script type="text/javascript" charset="UTF-8">
+function currentTime(){
+ var d = new Date(),str = '';
+ str += d.getFullYear()+'-';
+ str  += d.getMonth() + 1+'-';
+ str  += d.getDate()+' ';
+ str += d.getHours()+':';
+ str  += d.getMinutes()+':';
+ str+= d.getSeconds()+' ';
+return str;
+}
+
+function callChatGPTAPI(message) {
+  const apiKey = "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";
+  const apiUrl = "http://openai-proxy.openai-proxy.1516973338998632.us-west-1.fc.devsapp.net/";
+
+
+  $.ajax({
+    url: apiUrl,
+    type: "POST",
+    dataType: "json",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`
+    },
+    data: JSON.stringify({
+      "messages": message
+    }),
+    success: function(response) {
+      const chatGPTResponse = response.choices[0].message.content;
+      var respMessage = $('<div>', { class: 'message frnd_message' }).html('<p>'+chatGPTResponse+'<br><span>'+currentTime()+'</span></p>');
+
+    // 将新的<div>元素追加到.chatBox容器中
+    $('.chatBox').append(newMessage);
+    },
+    error: function(error) {
+      console.error("Error:", error);
+    }
+  });
+}
+
+$(document).ready(function(){
+  $("#sendMsg").click(function(){
+    var msg = $("input").val();
+    if(msg == ""){
+      alert("输入不能为空");
+      return;
+    }
+    // 创建一个新的<div>元素
+    var newMessage = $('<div>', { class: 'message my_message' }).html('<p>'+msg+'<br><span>'+currentTime()+'</span></p>');
+
+    // 将新的<div>元素追加到.chatBox容器中
+    $('.chatBox').append(newMessage);
+	$('#chatTextInput').val("");
+    $("#sendMsg").addClass("send_msg");
+    $("#sendMsg").text("发送中...");
+	$.ajax({
+      url:"http://openai-proxy-openai-proxy-tggfkcvpzk.us-west-1.fcapp.run",
+      type:"POST",
+      data:{
+        msg:msg
+      }
+    }).done(function(data){
+      $("#sendMsg").removeClass("send_msg");
+      $("#sendMsg").text("发送成功");
+  });
+});
+});
+</script>
+</body>
+</html>

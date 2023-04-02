@@ -1,0 +1,27 @@
+# Tomcat
+server:
+  port: 9407
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: dongxin-group
+  profiles:
+    # 环境配置
+    active: ${SPRING_PROFILE:dev}
+
+# Your API Key for OpenAI
+openai_api_key: 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
+# Provide proxy for OpenAI API. e.g. http://127.0.0.1:7890
+https_proxy: http://openai-proxy.openai-proxy.1516973338998632.us-west-1.fc.devsapp.net
+# Custom base url for OpenAI API. default: https://api.openai.com
+openai_api_base_url:
+# Inject analytics or other scripts before </head> of the page
+head_scripts:
+# Secret string for the project. Use for generating signatures for API calls
+secret_key:
+# Set password for site. If not set, site will be public
+site_password:
+# ID of the model to use. https://platform.openai.com/docs/api-reference/models/list
+openai_api_model: gpt-3.5-turbo

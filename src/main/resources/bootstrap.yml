@@ -12,7 +12,7 @@ spring:
     active: ${SPRING_PROFILE:dev}
 
 # Your API Key for OpenAI
-openai_api_key: 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
+openai_api_key: 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
 # Provide proxy for OpenAI API. e.g. http://127.0.0.1:7890
 https_proxy: http://openai-proxy.openai-proxy.1516973338998632.us-west-1.fc.devsapp.net/v1/chat/completions
 # Custom base url for OpenAI API. default: https://api.openai.com

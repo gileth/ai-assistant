@@ -5,16 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.ganlansi.chat.exception.BusinessException;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.springframework.util.StringUtils;
 
 /**
@@ -36,6 +30,15 @@ class RequestUtil {
     private OkHttpClient mOkHttpClient;//OKhttpClient对象
     private Request mOkHttpRequest;//请求对象
     private Request.Builder mRequestBuilder;//请求对象的构建者
+
+
+    private long callTimeout = 60;//超时时间
+    private long  readTimeout = 60;//读取超时时间
+
+    private long  writeTimeout = 60;//写入超时时间
+
+    private long connectTimeout = 60;//连接超时时间
+
 
 
     RequestUtil(String methodType, String url, Map<String, String> paramsMap, Map<String, String> headerMap, CallBackUtil callBack) throws Exception {
@@ -76,7 +79,10 @@ class RequestUtil {
      * 创建OKhttpClient实例。
      */
     private void getInstance() throws Exception {
-        mOkHttpClient = new OkHttpClient();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().callTimeout(callTimeout, TimeUnit.SECONDS).connectTimeout(connectTimeout, TimeUnit.SECONDS)
+                .readTimeout(readTimeout, TimeUnit.SECONDS).writeTimeout(writeTimeout, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(true);
+        mOkHttpClient = builder.build();
         mRequestBuilder = new Request.Builder();
         if(mFile != null || mfileList != null || mfileMap != null){//先判断是否有文件，
             throw new BusinessException("当前不支持文件处理");

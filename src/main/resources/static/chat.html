@@ -63,7 +63,7 @@
         <div class="chatBox_input">
 <!--            <ion-icon name="happy-outline"></ion-icon>-->
 <!--            <ion-icon name="attach-outline"></ion-icon>-->
-            <input type="text" placeholder="输入聊天内容">
+            <input type="text" placeholder="输入聊天内容" id="chatTextInput">
             <ion-icon name="chatbox-ellipses" id="sendMsg"></ion-icon>
         </div>
     </div>
@@ -88,34 +88,6 @@ function currentTime(){
 return str;
 }
 
-function callChatGPTAPI(message) {
-  const apiKey = "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";
-  const apiUrl = "http://openai-proxy.openai-proxy.1516973338998632.us-west-1.fc.devsapp.net/";
-
-
-  $.ajax({
-    url: apiUrl,
-    type: "POST",
-    dataType: "json",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
-    },
-    data: JSON.stringify({
-      "messages": message
-    }),
-    success: function(response) {
-      const chatGPTResponse = response.choices[0].message.content;
-      var respMessage = $('<div>', { class: 'message frnd_message' }).html('<p>'+chatGPTResponse+'<br><span>'+currentTime()+'</span></p>');
-
-    // 将新的<div>元素追加到.chatBox容器中
-    $('.chatBox').append(newMessage);
-    },
-    error: function(error) {
-      console.error("Error:", error);
-    }
-  });
-}
 
 $(document).ready(function(){
   $("#sendMsg").click(function(){
@@ -133,16 +105,28 @@ $(document).ready(function(){
     $("#sendMsg").addClass("send_msg");
     $("#sendMsg").text("发送中...");
 	$.ajax({
-      url:"http://openai-proxy-openai-proxy-tggfkcvpzk.us-west-1.fcapp.run",
+      url:"/chat/doChat",
       type:"POST",
-      data:{
-        msg:msg
+      dataType: "json",
+      headers: {
+      "Content-Type": "application/json"
+    },
+      data:JSON.stringify({
+      "message": msg
+      }),
+      success: function(response) {
+        const chatGPTResponse = response.data;
+        var respMessage = $('<div>', { class: 'message frnd_message' }).html('<p>'+chatGPTResponse+'<br><span>'+currentTime()+'</span></p>');
+
+        // 将新的<div>元素追加到.chatBox容器中
+        $('.chatBox').append(respMessage);
+
+      },
+      error: function(error) {
+
       }
-    }).done(function(data){
-      $("#sendMsg").removeClass("send_msg");
-      $("#sendMsg").text("发送成功");
+    });
   });
-});
 });
 </script>
 </body>

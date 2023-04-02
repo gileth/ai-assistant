@@ -1,9 +1,13 @@
 package com.ganlansi.chat.bean;
 
 import com.ganlansi.chat.enums.ReturnCodeEnum;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
+@Getter
+@Setter
 public class ApiResult<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -11,6 +15,9 @@ public class ApiResult<T> implements Serializable {
     private String code;
     private String msg;
     private T data;
+
+    public ApiResult() {
+    }
 
     public ApiResult(String code, String msg, T data) {
         this.code = code;

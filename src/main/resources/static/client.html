@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div class="container">
+    <div class="leftSide">
+        <div class="header">
+
+            <ul class="nav_icons">
+                <!--                <li><ion-icon name="scan-circle-outline"></ion-icon></li>-->
+                <!--                <li><ion-icon name="chatbox"></ion-icon></li>-->
+                <!--                <li><ion-icon name="ellipsis-vertical"></ion-icon></li>-->
+            </ul>
+        </div>
+        <div class="chatlist">
+            <div class="block unread">
+                <div class="details">
+                    <div class="message_p">
+                        <p>此处增加一些配置选项</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="rightSide">
+        <div class="header">
+            <div class="imgText">
+
+                <h4><br><span></span></h4>
+            </div>
+            <ul class="nav_icons">
+                <!--                <li><ion-icon name="search-outline"></ion-icon></li>-->
+                <!--                <li><ion-icon name="ellipsis-vertical"></ion-icon></li>-->
+            </ul>
+        </div>
+
+        <div class="chatBox" name="chatBox">
+
+
+        </div>
+        <div class="chatBox_input">
+            <!--            <ion-icon name="happy-outline"></ion-icon>-->
+            <!--            <ion-icon name="attach-outline"></ion-icon>-->
+            <input type="text" placeholder="输入聊天内容" id="chatTextInput">
+            <ion-icon name="chatbox-ellipses" id="sendMsg"></ion-icon>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+<script src="https://cdn.staticfile.org/jquery/3.6.4/jquery.min.js"  crossorigin="anonymous"></script>
+<script src="socket.io.js"></script>
+<script type="text/javascript">
+function currentTime(){
+ var d = new Date(),str = '';
+ str += d.getFullYear()+'-';
+ str  += d.getMonth() + 1+'-';
+ str  += d.getDate()+' ';
+ str += d.getHours()+':';
+ str  += d.getMinutes()+':';
+ str+= d.getSeconds()+' ';
+return str;
+}
+
+function setText(text, uuid_str) {
+            let content = document.getElementById(uuid_str)
+            content.innerHTML = marked(text);
+}
+
+function uuid() {
+    var s = [];
+    var hexDigits = "0123456789abcdef";
+    for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    }
+    s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+    s[8] = s[13] = s[18] = s[23] = "-";
+
+    var uuid = s.join("");
+    return uuid;
+}
+$(document).ready(function(){
+let uid = window.localStorage.getItem("uid");
+if (uid == null || uid == '' || uid == 'null') {
+    uid = uuid();
+}
+    const serverUri = "http://localhost:8090";
+    const receiveEvent = "ClientReceive";
+
+    var socket;
+    connect(12345, '12124545s');
+
+    function connect(uid, tokenId) {
+        socket = io.connect(serverUri, {
+            query: {
+                userId: uid,
+                tokenId: tokenId
+            },
+            'force new connection': true
+        });
+    }
+    socket.on('connect', function () {
+            console.log("连接成功");
+        });
+        socket.on('chatevent', function(msg) {
+			if (msg.data == "[DONE]") {
+                text = '';
+                return;
+            }
+            let json_data = JSON.parse(msg.data)
+            if (json_data.content == null || json_data.content == 'null') {
+                text = '';
+                return;
+            }
+            text = text + json_data.content;
+            setText(text, uuid_str)
+		});
+    socket.on('disconnect', function() {
+			output('<span class="disconnect-msg">The client has disconnected!</span>');
+		});
+
+        function sendDisconnect() {
+                socket.disconnect();
+        }
+    let messageElement = $("#chatTextInput");
+    // 发消息
+    $("#sendMsg").click(function(){
+            uuid_str = uuid();
+            socket.emit('chatevent', messageElement.val());
+            // 创建一个新的<div>元素
+            var newMessage = $('<div>', { class: 'message my_message' }).html('<p>'+messageElement.val()+'<br><span>'+currentTime()+'</span></p>');
+
+            // 将新的<div>元素追加到.chatBox容器中
+            $('.chatBox').append(newMessage);
+
+    });
+});
+function send(type,data) {
+        socket.emit(type, data);
+    }
+</script>
+<!--<script type="text/javascript" charset="UTF-8">-->
+<!--function currentTime(){-->
+<!-- var d = new Date(),str = '';-->
+<!-- str += d.getFullYear()+'-';-->
+<!-- str  += d.getMonth() + 1+'-';-->
+<!-- str  += d.getDate()+' ';-->
+<!-- str += d.getHours()+':';-->
+<!-- str  += d.getMinutes()+':';-->
+<!-- str+= d.getSeconds()+' ';-->
+<!--return str;-->
+<!--}-->
+
+
+<!--$(document).ready(function(){-->
+<!--  $("#sendMsg").click(function(){-->
+<!--    var msg = $("input").val();-->
+<!--    if(msg == ""){-->
+<!--      alert("输入不能为空");-->
+<!--      return;-->
+<!--    }-->
+<!--    // 创建一个新的<div>元素-->
+<!--    var newMessage = $('<div>', { class: 'message my_message' }).html('<p>'+msg+'<br><span>'+currentTime()+'</span></p>');-->
+
+<!--    // 将新的<div>元素追加到.chatBox容器中-->
+<!--    $('.chatBox').append(newMessage);-->
+<!--	$('#chatTextInput').val("");-->
+<!--    $("#sendMsg").addClass("send_msg");-->
+<!--    $("#sendMsg").text("发送中...");-->
+<!--	$.ajax({-->
+<!--      url:"/chat/doChat",-->
+<!--      type:"POST",-->
+<!--      dataType: "json",-->
+<!--      headers: {-->
+<!--      "Content-Type": "application/json"-->
+<!--    },-->
+<!--      data:JSON.stringify({-->
+<!--      "message": msg-->
+<!--      }),-->
+<!--      success: function(response) {-->
+<!--        const chatGPTResponse = response.data;-->
+<!--        var respMessage = $('<div>', { class: 'message frnd_message' }).html('<p>'+chatGPTResponse+'<br><span>'+currentTime()+'</span></p>');-->
+
+<!--        // 将新的<div>元素追加到.chatBox容器中-->
+<!--        $('.chatBox').append(respMessage);-->
+
+<!--      },-->
+<!--      error: function(error) {-->
+
+<!--      }-->
+<!--    });-->
+<!--  });-->
+<!--});-->
+<!--</script>-->
+</body>
+</html>
+
